@@ -15,31 +15,43 @@ class ThermosTest < ActiveSupport::TestCase
     @product.destroy!
   end
 
+  def cache_key
+    "categories_show"
+  end
+
+  def primary_model
+    @category.class
+  end
+
+  def dependencies
+    [:category_items, :products]
+  end
+
   def fill
-    Thermos.fill(cache_key: "categories_show", primary_model: Category, dependencies: [:category_items, :products]) do |primary_key|
+    Thermos.fill(cache_key: cache_key, primary_model: primary_model, dependencies: dependencies) do |primary_key|
       Category.find(primary_key).to_json
     end
   end
 
   def fill_with_error
-    Thermos.fill(cache_key: "categories_show", primary_model: Category, dependencies: [:category_items, :products]) do |primary_key|
+    Thermos.fill(cache_key: cache_key, primary_model: primary_model, dependencies: dependencies) do |primary_key|
       raise "boom"
     end
   end
 
   def drink
-    Thermos.drink(cache_key: "categories_show", primary_key: @category.id)
+    Thermos.drink(cache_key: cache_key, primary_key: @category.id)
   end
 
   def keep_warm
-    Thermos.keep_warm(cache_key: "categories_show", primary_model: Category, primary_key: @category.id, dependencies: [:category_items, :products]) do |primary_key|
+    Thermos.keep_warm(cache_key: cache_key, primary_model: primary_model, primary_key: @category.id, dependencies: dependencies) do |primary_key|
       Category.find(primary_key).to_json
     end
   end
 
   def keep_error_warm
-    Thermos.keep_warm(cache_key: "categories_show", primary_model: Category, primary_key: @category.id, dependencies: [:category_items, :products]) do |primary_key|
-      Category.find(primary_key).to_json
+    Thermos.keep_warm(cache_key: cache_key, primary_model: primary_model, primary_key: @category.id, dependencies: dependencies) do |primary_key|
+      raise "boom"
     end
   end
 
