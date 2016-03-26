@@ -2,7 +2,8 @@ require 'test_helper'
 
 class ThermosTest < ActiveSupport::TestCase
   def setup
-    @category = Category.create!(name: "baseball")
+    @store = Store.create!(name: "sports store")
+    @category = Category.create!(name: "baseball", store: @store)
     @product = Product.create!(name: "glove")
     @category_item = CategoryItem.create!(name: "baseball glove", category: @category, product: @product)
   end
@@ -10,6 +11,7 @@ class ThermosTest < ActiveSupport::TestCase
   def teardown
     Thermos.empty
     Rails.cache.clear
+    @store.destroy!
     @category_item.destroy!
     @category.destroy!
     @product.destroy!
@@ -24,7 +26,7 @@ class ThermosTest < ActiveSupport::TestCase
   end
 
   def dependencies
-    [:category_items, :products]
+    [:store, :category_items, :products]
   end
 
   def fill
@@ -60,6 +62,7 @@ class ThermosTest < ActiveSupport::TestCase
 
     expected_response = {
       name: "baseball",
+      store_name: "sports store",
       category_items: [{
         name: "baseball glove",
         product_name: "glove"
@@ -78,6 +81,7 @@ class ThermosTest < ActiveSupport::TestCase
 
     expected_response = {
       name: "baseball",
+      store_name: "sports store",
       category_items: [{
         name: "baseball glove",
         product_name: "glove"
@@ -95,9 +99,64 @@ class ThermosTest < ActiveSupport::TestCase
 
     expected_response = {
       name: "softball",
+      store_name: "sports store",
       category_items: [{
         name: "baseball glove",
         product_name: "glove"
+      }]
+    }
+
+    keep_error_warm
+    assert_equal expected_response.to_json, keep_warm
+  end
+
+  test "rebuilds the cache on has_many model change" do
+    keep_warm
+
+    @category_item.update!(name: "catcher's mitt")
+
+    expected_response = {
+      name: "baseball",
+      store_name: "sports store",
+      category_items: [{
+        name: "catcher's mitt",
+        product_name: "glove"
+      }]
+    }
+
+    keep_error_warm
+    assert_equal expected_response.to_json, keep_warm
+  end
+
+  test "rebuilds the cache on belongs_to model change" do
+    keep_warm
+
+    @store.update!(name: "baseball store")
+
+    expected_response = {
+      name: "baseball",
+      store_name: "baseball store",
+      category_items: [{
+        name: "baseball glove",
+        product_name: "glove"
+      }]
+    }
+
+    keep_error_warm
+    assert_equal expected_response.to_json, keep_warm
+  end
+
+  test "rebuilds the cache on has_many through model change" do
+    keep_warm
+
+    @product.update!(name: "batting glove")
+
+    expected_response = {
+      name: "baseball",
+      store_name: "sports store",
+      category_items: [{
+        name: "baseball glove",
+        product_name: "batting glove"
       }]
     }
 
