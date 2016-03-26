@@ -1,12 +1,18 @@
 module Thermos
-  def self.keep_warm(cache_key:, primary_model:, dependencies: [], &block)
-    @registry ||= {}
-    @registry[cache_key] = Beverage.new(cache_key: cache_key, primary_model: primary_model, dependencies: dependencies, action: block)
+
+  def self.fill(cache_key:, primary_model:, dependencies: [], &block)
+    @thermos ||= {}
+    @thermos[cache_key] = Beverage.new(cache_key: cache_key, primary_model: primary_model, dependencies: dependencies, action: block)
   end
 
-  def self.fetch(cache_key:, primary_key:)
+  def self.keep_warm(cache_key:, primary_model:, primary_key:, dependencies: [], &block)
+    fill(cache_key: cache_key, primary_model: primary_model, dependencies: dependencies, &block)
+    drink(cache_key: cache_key, primary_key: primary_key)
+  end
+
+  def self.drink(cache_key:, primary_key:)
     Rails.cache.fetch([cache_key, primary_key]) do
-      @registry[cache_key].action.call(primary_key)
+      @thermos[cache_key].action.call(primary_key)
     end
   end
 end

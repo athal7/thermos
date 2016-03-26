@@ -2,17 +2,15 @@ require 'test_helper'
 
 class ThermosTest < ActiveSupport::TestCase
   def setup
-    category = Category.create!(name: "baseball")
-    product = Product.create!(name: "glove")
-    category_item = CategoryItem.create!(name: "baseball glove", category: category, product: product)
+    @category = Category.create!(name: "baseball")
+    @product = Product.create!(name: "glove")
+    @category_item = CategoryItem.create!(name: "baseball glove", category: @category, product: @product)
+  end
 
-    Thermos.keep_warm(cache_key: "categories_show", primary_model: Category, dependencies: [:category_items, :products]) do |primary_key|
+  test "keeps the cache warm using fill / drink" do
+    Thermos.fill(cache_key: "categories_show", primary_model: Category, dependencies: [:category_items, :products]) do |primary_key|
       Category.find(primary_key).to_json
     end
-  end
-
-  test "returns the expected response on the first request" do
-    response = Thermos.fetch(cache_key: "categories_show", primary_key: 1)
 
     expected_response = {
       name: "baseball",
@@ -22,14 +20,14 @@ class ThermosTest < ActiveSupport::TestCase
       }]
     }
 
+    response = Thermos.drink(cache_key: "categories_show", primary_key: @category.id)
     assert_equal expected_response.to_json, response
   end
 
-  test "returns the expected response on the second request, and pulls it from cache" do
-    Thermos.fetch(cache_key: "categories_show", primary_key: 1)
-
-    # TODO assert Category.find isn't called
-    response = Thermos.fetch(cache_key: "categories_show", primary_key: 1)
+  test "keeps the cache warm using keep_warm" do
+    Thermos.keep_warm(cache_key: "categories_show", primary_model: Category, primary_key: @category.id, dependencies: [:category_items, :products]) do |primary_key|
+      Category.find(primary_key).to_json
+    end
 
     expected_response = {
       name: "baseball",
@@ -39,6 +37,10 @@ class ThermosTest < ActiveSupport::TestCase
       }]
     }
 
+    response = Thermos.keep_warm(cache_key: "categories_show", primary_model: Category, primary_key: @category.id, dependencies: [:category_items, :products]) do |primary_key|
+      raise "boom"
+    end
     assert_equal expected_response.to_json, response
   end
+
 end
