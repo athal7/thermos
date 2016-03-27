@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = Thermos::VERSION
   s.authors     = ["Andrew Thal"]
   s.email       = ["hi@athal7.com"]
-  s.homepage    = nil
+  s.homepage    = "https://github.com/athal7/thermos"
   s.summary     = "Always-warm, auto-rebuilding rails caching without timers or touching."
   s.description = "Thermos is a library for caching in rails that re-warms caches in the background based on model changes."
   s.license     = "MIT"
