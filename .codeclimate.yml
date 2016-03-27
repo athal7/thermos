@@ -9,8 +9,6 @@ engines:
       - ruby
   fixme:
     enabled: true
-  rubocop:
-    enabled: true
   reek:
     enabled: true
 ratings:
