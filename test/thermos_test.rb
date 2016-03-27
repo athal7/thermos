@@ -129,4 +129,25 @@ class ThermosTest < ActiveSupport::TestCase
     assert_equal 2, Thermos.drink(key: "key", id: category.id)
     assert_raises(MockExpectationError) { mock.verify }
   end
+
+  test "only rebuilds cache for stated dependencies, even if another cache has an associated model of the primary" do
+    category_mock = Minitest::Mock.new
+    product_mock = Minitest::Mock.new
+    category = categories(:baseball)
+    product = products(:glove)
+
+    Thermos.fill(key: "category_key", model: Category) do |id|
+      category_mock.call(id)
+    end
+
+    Thermos.fill(key: "product_key", model: Product) do |id|
+      product_mock.call(id)
+    end
+
+    category_mock.expect(:call, 2, [category.id])
+    product_mock.expect(:call, 2, [product.id])
+    product.update!(name: "foo")
+    assert_raises(MockExpectationError) { category_mock.verify }
+    product_mock.verify
+  end
 end
