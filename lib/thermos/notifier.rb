@@ -8,7 +8,7 @@ module Thermos::Notifier
   private
 
   def notify_thermos
-    Thermos.model_changed(self)
+    Thermos::RefillJob.perform_later self
   end
 
 end

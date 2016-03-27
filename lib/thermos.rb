@@ -1,5 +1,6 @@
 require "thermos/notifier"
 require "thermos/beverage"
+require "thermos/refill_job"
 
 module Thermos
 
@@ -19,16 +20,9 @@ module Thermos
     end
   end
 
-  def self.model_changed(model)
-    refill_primary_caches(model)
-    refill_dependency_caches(model)
-  end
-
   def self.empty
     @thermos = {}
   end
-
-  private
 
   def self.refill_primary_caches(model)
     @thermos.values.select do |beverage|
