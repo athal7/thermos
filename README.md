@@ -1,6 +1,5 @@
 # Thermos
 [![Code Climate](https://codeclimate.com/github/athal7/thermos/badges/gpa.svg)](https://codeclimate.com/github/athal7/thermos)
-[![Test Coverage](https://codeclimate.com/github/athal7/thermos/badges/coverage.svg)](https://codeclimate.com/github/athal7/thermos/coverage)
 [![Build Status](https://travis-ci.org/athal7/thermos.svg?branch=master)](https://travis-ci.org/athal7/thermos)
 
 Thermos is a library for caching in rails that re-warms caches in the background based on model changes.
@@ -18,7 +17,7 @@ Most cache strategies require either time-based or key-based expiration. These s
 ##### Both:
 - Potentially expensive cold-cache operations, people sometimes mitigate this with denormalization, which has it's own cache-related problems.
 
-With Thermos, the cache-filling operation is performed in the background, by observing model (and dependent model) changes. 
+With Thermos, the cache-filling operation is performed in the background, by observing model (and dependent model) changes.
 
 #### Thermos benefits:
 - Always warm cache
