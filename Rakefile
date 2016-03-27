@@ -14,11 +14,6 @@ RDoc::Task.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
-
-
-
-
-
 Bundler::GemHelper.install_tasks
 
 require 'rake/testtask'
@@ -30,5 +25,15 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = false
 end
 
+task(:default) do
+  Dir.chdir("test/dummy")
+  system("rake db:migrate")
+  Dir.chdir("../../")
+  Rake::Task['test'].execute
+end
 
-task default: :test
+
+
+
+
+
