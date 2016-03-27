@@ -4,21 +4,17 @@ class Thermos::Beverage
   def initialize(cache_key:, primary_model:, dependencies:, action:)
     @cache_key = cache_key
     @primary_model = primary_model
-    @dependencies = dependencies
+    @dependencies = dependencies.map do |dependency|
+      Thermos::Dependency.new(primary_model: primary_model, association_name: dependency)
+    end
     @action = action
 
     set_observers
   end
 
-  def dependency_classes
-    @dependencies.map do |dependency|
-      @primary_model.reflections[dependency.to_s].class_name.constantize
-    end
-  end
-
-  def dependencies_for_class(klazz)
+  def dependencies_for_class(klass)
     @dependencies.select do |dependency|
-      @primary_model.reflections[dependency.to_s].class_name == klazz.name
+      dependency.klass_name == klass.name
     end
   end
 
@@ -26,7 +22,7 @@ class Thermos::Beverage
 
   def set_observers
     observe(@primary_model)
-    dependency_classes.each { |klazz| observe(klazz) }
+    @dependencies.each { |dependency| observe(dependency.klass_name) }
   end
 
   def observe(model)

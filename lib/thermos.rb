@@ -1,5 +1,6 @@
-require "thermos/notifier"
 require "thermos/beverage"
+require "thermos/dependency"
+require "thermos/notifier"
 require "thermos/refill_job"
 
 module Thermos
@@ -33,11 +34,10 @@ module Thermos
   end
 
   def self.refill_dependency_caches(model)
-    @thermos.values.select do |beverage|
-      beverage.dependency_classes.include?(model.class)
-    end.each do |beverage|
-      beverage.dependencies_for_class(model.class).each do |association|
-        beverage_models = beverage.primary_model.joins(association).where("#{association.to_s.pluralize}.id = #{model.id}")
+    @thermos.values.each do |beverage|
+      dependencies = beverage.dependencies.select { |dependency| dependency.klass_name == model.class }
+      dependencies.each do |dependency|
+        beverage_models = beverage.primary_model.joins(dependency.association_name).where("#{dependency.table_name}.id = #{model.id}")
         beverage_models.each do |beverage_model|
           refill(beverage, beverage_model.id)
         end
