@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thermos (0.0.2)
+    thermos (0.0.3)
       rails
 
 GEM
