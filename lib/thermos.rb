@@ -37,7 +37,7 @@ module Thermos
     @thermos.values.each do |beverage|
       deps = beverage.deps.select { |dependency| dependency.klass == model.class }
       deps.each do |dependency|
-        beverage_models = beverage.model.joins(dependency.association).where("#{dependency.table}.id = #{model.id}")
+        beverage_models = beverage.model.joins(dependency.association).where(dependency.table => { id: model.id })
         beverage_models.each do |beverage_model|
           refill(beverage, beverage_model.id)
         end
