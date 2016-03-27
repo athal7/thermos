@@ -26,10 +26,8 @@ module Thermos
   end
 
   def self.refill_primary_caches(model)
-    @thermos.values.select do |beverage|
-      beverage.model == model.class
-    end.each do |beverage|
-      refill(beverage, model.send(beverage.lookup_key))
+    @thermos.values.each do |beverage|
+      refill(beverage, model.send(beverage.lookup_key)) if beverage.model == model.class
     end
   end
 
@@ -38,7 +36,7 @@ module Thermos
       deps = beverage.deps.select { |dependency| dependency.klass == model.class }
       deps.each do |dependency|
         beverage_models = beverage.model.joins(dependency.association).where(dependency.table => { id: model.id })
-        beverage_models.each do |beverage_model|
+        beverage_models.find_each do |beverage_model|
           refill(beverage, beverage_model.send(beverage.lookup_key))
         end
       end
