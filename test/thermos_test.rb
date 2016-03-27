@@ -1,166 +1,132 @@
 require 'test_helper'
 
 class ThermosTest < ActiveSupport::TestCase
-  def setup
-    @store = Store.create!(name: "sports store")
-    @category = Category.create!(name: "baseball", store: @store)
-    @product = Product.create!(name: "glove")
-    @category_item = CategoryItem.create!(name: "baseball glove", category: @category, product: @product)
-  end
+  ActiveSupport.test_order = :random
+  self.use_transactional_fixtures = true
 
   def teardown
     Thermos.empty
     Rails.cache.clear
-    @store.destroy!
-    @category_item.destroy!
-    @category.destroy!
-    @product.destroy!
-  end
-
-  def cache_key
-    "categories_show"
-  end
-
-  def primary_model
-    @category.class
-  end
-
-  def dependencies
-    [:store, :category_items, :products]
-  end
-
-  def fill
-    Thermos.fill(cache_key: cache_key, primary_model: primary_model, dependencies: dependencies) do |primary_key|
-      Category.find(primary_key).to_json
-    end
-  end
-
-  def fill_with_error
-    Thermos.fill(cache_key: cache_key, primary_model: primary_model, dependencies: dependencies) do |primary_key|
-      raise "boom"
-    end
-  end
-
-  def drink
-    Thermos.drink(cache_key: cache_key, primary_key: @category.id)
-  end
-
-  def keep_warm
-    Thermos.keep_warm(cache_key: cache_key, primary_model: primary_model, primary_key: @category.id, dependencies: dependencies) do |primary_key|
-      Category.find(primary_key).to_json
-    end
-  end
-
-  def keep_error_warm
-    Thermos.keep_warm(cache_key: cache_key, primary_model: primary_model, primary_key: @category.id, dependencies: dependencies) do |primary_key|
-      raise "boom"
-    end
   end
 
   test "keeps the cache warm using fill / drink" do
-    fill
+    mock = Minitest::Mock.new
 
-    expected_response = {
-      name: "baseball",
-      store_name: "sports store",
-      category_items: [{
-        name: "baseball glove",
-        product_name: "glove"
-      }]
-    }
+    Thermos.fill(key: "key", model: Category) do |id|
+      mock.call(id)
+    end
 
-    assert_equal expected_response.to_json, drink
+    mock.expect(:call, 1, [1])
+    assert_equal 1, Thermos.drink(key: "key", id: 1)
+    mock.verify
 
-    fill_with_error
-
-    assert_equal expected_response.to_json, drink
+    mock.expect(:call, 2, [1])
+    assert_equal 1, Thermos.drink(key: "key", id: 1)
+    assert_raises(MockExpectationError) { mock.verify }
   end
 
   test "keeps the cache warm using keep_warm" do
-    keep_warm
+    mock = Minitest::Mock.new
 
-    expected_response = {
-      name: "baseball",
-      store_name: "sports store",
-      category_items: [{
-        name: "baseball glove",
-        product_name: "glove"
-      }]
-    }
+    mock.expect(:call, 1, [1])
+    response = Thermos.keep_warm(key: "key", model: Category, id: 1) do |id|
+      mock.call(id)
+    end
+    assert_equal 1, response
+    mock.verify
 
-    keep_error_warm
-    assert_equal expected_response.to_json, keep_warm
+    mock.expect(:call, 2, [1])
+    response = Thermos.keep_warm(key: "key", model: Category, id: 1) do |id|
+      mock.call(id)
+    end
+    assert_equal 1, response
+    assert_raises(MockExpectationError) { mock.verify }
   end
 
   test "rebuilds the cache on primary model change" do
-    keep_warm
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
 
-    @category.update!(name: "softball")
+    Thermos.fill(key: "key", model: Category) do |id|
+      mock.call(id)
+    end
 
-    expected_response = {
-      name: "softball",
-      store_name: "sports store",
-      category_items: [{
-        name: "baseball glove",
-        product_name: "glove"
-      }]
-    }
+    mock.expect(:call, 1, [category.id])
+    assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    mock.verify
 
-    keep_error_warm
-    assert_equal expected_response.to_json, keep_warm
+    mock.expect(:call, 2, [category.id])
+    category.update!(name: "foo")
+    mock.verify
+
+    mock.expect(:call, 3, [category.id])
+    assert_equal 2, Thermos.drink(key: "key", id: category.id)
+    assert_raises(MockExpectationError) { mock.verify }
   end
 
   test "rebuilds the cache on has_many model change" do
-    keep_warm
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    category_item = category_items(:baseball_glove)
 
-    @category_item.update!(name: "catcher's mitt")
+    Thermos.fill(key: "key", model: Category, deps: [:category_items]) do |id|
+      mock.call(id)
+    end
 
-    expected_response = {
-      name: "baseball",
-      store_name: "sports store",
-      category_items: [{
-        name: "catcher's mitt",
-        product_name: "glove"
-      }]
-    }
+    mock.expect(:call, 1, [category.id])
+    assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    mock.verify
 
-    keep_error_warm
-    assert_equal expected_response.to_json, keep_warm
+    mock.expect(:call, 2, [category.id])
+    category_item.update!(name: "foo")
+    mock.verify
+
+    mock.expect(:call, 3, [category.id])
+    assert_equal 2, Thermos.drink(key: "key", id: category.id)
+    assert_raises(MockExpectationError) { mock.verify }
   end
 
   test "rebuilds the cache on belongs_to model change" do
-    keep_warm
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    store = stores(:sports)
 
-    @store.update!(name: "baseball store")
+    Thermos.fill(key: "key", model: Category, deps: [:store]) do |id|
+      mock.call(id)
+    end
 
-    expected_response = {
-      name: "baseball",
-      store_name: "baseball store",
-      category_items: [{
-        name: "baseball glove",
-        product_name: "glove"
-      }]
-    }
+    mock.expect(:call, 1, [category.id])
+    assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    mock.verify
 
-    keep_error_warm
-    assert_equal expected_response.to_json, keep_warm
+    mock.expect(:call, 2, [category.id])
+    store.update!(name: "foo")
+    mock.verify
+
+    mock.expect(:call, 3, [category.id])
+    assert_equal 2, Thermos.drink(key: "key", id: category.id)
+    assert_raises(MockExpectationError) { mock.verify }
   end
 
   test "rebuilds the cache on has_many through model change" do
-    keep_warm
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    product = products(:glove)
 
-    @product.update!(name: "batting glove")
+    Thermos.fill(key: "key", model: Category, deps: [:products]) do |id|
+      mock.call(id)
+    end
 
-    expected_response = {
-      name: "baseball",
-      store_name: "sports store",
-      category_items: [{
-        name: "baseball glove",
-        product_name: "batting glove"
-      }]
-    }
+    mock.expect(:call, 1, [category.id])
+    assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    mock.verify
 
-    keep_error_warm
-    assert_equal expected_response.to_json, keep_warm
+    mock.expect(:call, 2, [category.id])
+    product.update!(name: "foo")
+    mock.verify
+
+    mock.expect(:call, 3, [category.id])
+    assert_equal 2, Thermos.drink(key: "key", id: category.id)
+    assert_raises(MockExpectationError) { mock.verify }
   end
 end

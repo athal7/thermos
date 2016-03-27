@@ -1,28 +1,28 @@
 class Thermos::Beverage
-  attr_reader :cache_key, :primary_model, :dependencies, :action
+  attr_reader :key, :model, :deps, :action
 
-  def initialize(cache_key:, primary_model:, dependencies:, action:)
-    @cache_key = cache_key
-    @primary_model = primary_model
-    @dependencies = dependencies.map do |dependency|
-      Thermos::Dependency.new(primary_model: primary_model, association_name: dependency)
+  def initialize(key:, model:, deps:, action:)
+    @key = key
+    @model = model
+    @deps = deps.map do |dep|
+      Thermos::Dependency.new(model: model, association: dep)
     end
     @action = action
 
     set_observers
   end
 
-  def dependencies_for_class(klass)
-    @dependencies.select do |dependency|
-      dependency.klass_name == klass.name
+  def deps_for_class(klass)
+    @deps.select do |dep|
+      dep.klass == klass.name
     end
   end
 
   private
 
   def set_observers
-    observe(@primary_model)
-    @dependencies.each { |dependency| observe(dependency.klass_name) }
+    observe(@model)
+    @deps.each { |dep| observe(dep.klass) }
   end
 
   def observe(model)
