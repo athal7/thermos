@@ -28,7 +28,7 @@ With Thermos, the cache-filling operation is performed in the background, by obs
 
 ## Examples
 
-#### `keep_warm`
+#### keep_warm
 ##### API Controller
 ```ruby
 json = Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:id], deps: [:category_items, :products]) do |id|
@@ -48,8 +48,8 @@ end
 render rendered_template
 ```
 
-#### `fill / drink`
-##### Initializer
+#### fill / drink
+##### Rails Initializer
 ```ruby
 Thermos.fill(key: "api_categories_show", model: Category, deps: [:category_items, :products]) do |id|
   Category.find(id).to_json
