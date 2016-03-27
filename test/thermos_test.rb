@@ -150,4 +150,30 @@ class ThermosTest < ActiveSupport::TestCase
     assert_raises(MockExpectationError) { category_mock.verify }
     product_mock.verify
   end
+
+  test "accepts and can rebuild off of an id other than the 'id'" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    product = products(:glove)
+
+    Thermos.fill(key: "key", model: Category, deps: [:products], lookup_key: :name) do |id|
+      mock.call(id)
+    end
+
+    mock.expect(:call, 1, [category.name])
+    assert_equal 1, Thermos.drink(key: "key", id: category.name)
+    mock.verify
+
+    mock.expect(:call, 2, ["foo"])
+    category.update!(name: "foo")
+    mock.verify
+
+    mock.expect(:call, 3, [category.name])
+    product.update!(name: "foo")
+    mock.verify
+
+    mock.expect(:call, 4, [category.name])
+    assert_equal 3, Thermos.drink(key: "key", id: category.name)
+    assert_raises(MockExpectationError) { mock.verify }
+  end
 end
