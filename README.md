@@ -57,7 +57,7 @@ end
 
 ##### API Controller
 ```ruby
-json = Thermos.drink(key: "frontend_categories_show", id: params[:id])
+json = Thermos.drink(key: "api_categories_show", id: params[:id])
 render json: json
 ```
 
