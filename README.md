@@ -68,10 +68,14 @@ render json: json
 Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:slug], lookup_key: :slug) do |slug|
   Category.find_by(slug: slug).to_json
 end
-
+```
+or
+```ruby
 Thermos.fill(key: "api_categories_show", model: Category, lookup_key: :slug) do |slug|
   Category.find_by(slug: slug).to_json
 end
+
+Thermos.drink(key: "api_categories_show", id: params[:slug])
 ```
 
 ## Contributing
