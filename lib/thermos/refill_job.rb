@@ -18,8 +18,8 @@ module Thermos
         deps = beverage.deps.select { |dependency| dependency.klass == model.class }
         deps.each do |dependency|
           beverage_models = beverage.model.joins(dependency.association).where(dependency.table => { id: model.id })
-          beverage_models.find_each do |beverage_model|
-            Thermos::RebuildCacheJob.perform_later(beverage.key, beverage_model.send(beverage.lookup_key))
+          beverage_models.pluck(beverage.lookup_key).each do |lookup_key|
+            Thermos::RebuildCacheJob.perform_later(beverage.key, lookup_key)
           end
         end
       end
