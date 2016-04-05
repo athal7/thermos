@@ -1,4 +1,5 @@
 # Thermos
+[![Gem Version](https://badge.fury.io/rb/thermos.svg)](https://badge.fury.io/rb/thermos)
 [![Code Climate](https://codeclimate.com/github/athal7/thermos/badges/gpa.svg)](https://codeclimate.com/github/athal7/thermos)
 [![Build Status](https://travis-ci.org/athal7/thermos.svg?branch=master)](https://travis-ci.org/athal7/thermos)
 
