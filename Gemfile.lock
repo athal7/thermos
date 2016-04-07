@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     thermos (0.0.6)
-      rails
+      rails (>= 4.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -106,6 +106,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  rake
   sqlite3
   thermos!
 
