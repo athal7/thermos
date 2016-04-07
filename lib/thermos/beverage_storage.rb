@@ -10,7 +10,7 @@ class Thermos::BeverageStorage
     @beverages[key]
   end
 
-  def empty!
+  def empty
     @beverages = {}
   end
 

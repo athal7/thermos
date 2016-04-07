@@ -5,7 +5,7 @@ class ThermosTest < ActiveSupport::TestCase
   self.use_transactional_fixtures = true
 
   def teardown
-    Thermos::BeverageStorage.instance.empty!
+    Thermos::BeverageStorage.instance.empty
     Rails.cache.clear
   end
 
