@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ThermosTest < ActiveSupport::TestCase
   ActiveSupport.test_order = :random
-  self.use_transactional_fixtures = true
+  self.use_transactional_tests = true
 
   def teardown
     Thermos::BeverageStorage.instance.empty
