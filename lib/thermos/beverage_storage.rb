@@ -3,7 +3,7 @@ class Thermos::BeverageStorage
 
   def add_beverage(beverage)
     @beverages ||= {}
-    @beverages[beverage.key] = beverage
+    @beverages[beverage.key] ||= beverage
   end
 
   def get_beverage(key)
