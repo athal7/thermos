@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Thermos
   class Beverage
     attr_reader :key, :model, :deps, :action, :lookup_key
@@ -17,9 +19,9 @@ module Thermos
     def lookup_keys_for_dep_model(dep_model)
       @deps.flat_map do |dep|
         return [] unless dep.klass == dep_model.class
-        @model.joins(dep.association).
-          where(dep.table => { id: dep_model.id }).
-          pluck(@lookup_key)
+        @model.joins(dep.association)
+              .where(dep.table => { id: dep_model.id })
+              .pluck(@lookup_key)
       end.uniq
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Thermos
   class RebuildCacheJob < ActiveJob::Base
     def perform(key, id)

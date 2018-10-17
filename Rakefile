@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 begin
   require 'bundler/setup'
 rescue LoadError
@@ -26,14 +28,8 @@ Rake::TestTask.new(:test) do |t|
 end
 
 task(:default) do
-  Dir.chdir("test/dummy")
-  system("rake db:migrate")
-  Dir.chdir("../../")
+  Dir.chdir('test/dummy')
+  system('rake db:migrate')
+  Dir.chdir('../../')
   Rake::Task['test'].execute
 end
-
-
-
-
-
-
