@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Thermos
   class RefillJob < ActiveJob::Base
     def perform(model)

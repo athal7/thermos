@@ -1,12 +1,13 @@
-require "thermos/beverage"
-require "thermos/beverage_storage"
-require "thermos/dependency"
-require "thermos/notifier"
-require "thermos/refill_job"
-require "thermos/rebuild_cache_job"
+# frozen_string_literal: true
+
+require 'thermos/beverage'
+require 'thermos/beverage_storage'
+require 'thermos/dependency'
+require 'thermos/notifier'
+require 'thermos/refill_job'
+require 'thermos/rebuild_cache_job'
 
 module Thermos
-
   def self.keep_warm(key:, model:, id:, deps: [], lookup_key: nil, &block)
     fill(key: key, model: model, deps: deps, lookup_key: lookup_key, &block)
     drink(key: key, id: id)

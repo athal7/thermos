@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Thermos
   class Dependency
     attr_reader :model, :association, :klass, :table

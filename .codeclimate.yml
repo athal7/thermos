@@ -7,8 +7,12 @@ engines:
       - ruby
   fixme:
     enabled: true
-  reek:
+  rubocop:
     enabled: true
+  brakeman:
+    enabled: true
+    config:
+      app_path: test/dummy
 ratings:
   paths:
   - Gemfile.lock

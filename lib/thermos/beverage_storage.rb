@@ -1,20 +1,24 @@
-class Thermos::BeverageStorage
-  include Singleton
+# frozen_string_literal: true
 
-  def add_beverage(beverage)
-    @beverages ||= {}
-    @beverages[beverage.key] ||= beverage
-  end
+module Thermos
+  class BeverageStorage
+    include Singleton
 
-  def get_beverage(key)
-    @beverages[key]
-  end
+    def add_beverage(beverage)
+      @beverages ||= {}
+      @beverages[beverage.key] ||= beverage
+    end
 
-  def empty
-    @beverages = {}
-  end
+    def get_beverage(key)
+      @beverages[key]
+    end
 
-  def beverages
-    @beverages.values
+    def empty
+      @beverages = {}
+    end
+
+    def beverages
+      @beverages.values
+    end
   end
 end
