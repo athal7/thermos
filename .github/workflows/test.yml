@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: ["2.6.4","2.5.6"]
+        ruby: ["2.6.x","2.5.x"]
         rails: ["6.0.2","5.2.0","5.1.0"]
     steps:
     - uses: actions/checkout@v1
