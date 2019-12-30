@@ -6,11 +6,12 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - '2.5.x'
-          - '2.4.x'
+          - "2.6.x"
+          - "2.5.x"
         rails:
-          - '5.2.0'
-          - '5.1.0'
+          - "6.0.2"
+          - "5.2.0"
+          - "5.1.0"
     steps:
       - name: Checkout
         uses: actions/checkout@v1
