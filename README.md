@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/thermos.svg)](https://badge.fury.io/rb/thermos)
 [![Code Climate](https://codeclimate.com/github/athal7/thermos/badges/gpa.svg)](https://codeclimate.com/github/athal7/thermos)
-(![Build Status)](https://img.shields.io/github/workflow/status/athal7/thermos/CI/master)
+![Build Status)](https://img.shields.io/github/workflow/status/athal7/thermos/CI/master)
 
 Thermos is a library for caching in rails that re-warms caches in the background based on model changes.
 
