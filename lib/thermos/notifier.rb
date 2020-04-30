@@ -5,7 +5,7 @@ module Thermos
     extend ActiveSupport::Concern
 
     included do
-      after_save :notify_thermos
+      after_commit :notify_thermos
     end
 
     private
