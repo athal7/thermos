@@ -65,6 +65,30 @@ class ThermosTest < ActiveSupport::TestCase
     assert_raises(MockExpectationError) { mock.verify }
   end
 
+  test "does not rebuild the cache on rolled back primary model change" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+
+    Thermos.fill(key: "key", model: Category) do |id|
+      mock.call(id)
+    end
+
+    mock.expect(:call, 1, [category.id])
+    assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    mock.verify
+
+    mock.expect(:call, 2, [category.id])
+    ActiveRecord::Base.transaction do
+      category.update!(name: "foo")
+      raise ActiveRecord::Rollback
+    end
+    assert_raises(MockExpectationError) { mock.verify }
+
+    mock.expect(:call, 3, [category.id])
+    assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    assert_raises(MockExpectationError) { mock.verify }
+  end
+
   test "does not rebuild the cache for an unrelated primary model change" do
     mock = Minitest::Mock.new
     category = categories(:baseball)
