@@ -19,7 +19,7 @@ jobs:
         run: |
           sudo apt-get install libsqlite3-dev
       - name: Setup Ruby
-        uses: actions/setup-ruby@v1.1.1
+        uses: actions/setup-ruby@v1.1.2
         with:
           ruby-version: ${{ matrix.ruby }}
       - name: Bundle
