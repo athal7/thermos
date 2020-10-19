@@ -36,11 +36,11 @@ With Thermos, the cache-filling operation is performed in the background, by obs
 
 In these examples any changes to a category, it's category items, or it's products will trigger a rebuild of the cache for that category.
 
-#### keep_warm
+### keep_warm
 
 With `keep_warm`, the cached content is defined along with the cache block and dependencies definition.
 
-##### API Controller
+#### API Controller
 
 ```ruby
 json = Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:id], deps: [:category_items, :products]) do |id|
@@ -50,7 +50,7 @@ end
 render json: json
 ```
 
-##### Frontend Controller
+#### Frontend Controller
 
 ```ruby
 rendered_template = Thermos.keep_warm(key: "frontend_categories_show", model: Category, id: params[:id], deps: [:category_items, :products]) do |id|
@@ -61,11 +61,11 @@ end
 render rendered_template
 ```
 
-#### fill / drink
+### fill / drink
 
 With `fill` and `drink` the cache definition can be in one place, and the response can be used in multiple other places. This is useful if you share the same response in multiple controllers, and want to limit your number of cache keys. Even in the unlikely occurrence of a cache store failure and therefore cache miss, drink can still build up your desired response from the block that was originally defined in `fill`.
 
-##### Rails Initializer
+#### Rails Initializer
 
 ```ruby
 Thermos.fill(key: "api_categories_show", model: Category, deps: [:category_items, :products]) do |id|
@@ -73,7 +73,7 @@ Thermos.fill(key: "api_categories_show", model: Category, deps: [:category_items
 end
 ```
 
-##### API Controller
+#### API Controller
 
 ```ruby
 json = Thermos.drink(key: "api_categories_show", id: params[:id])
