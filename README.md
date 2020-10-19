@@ -10,22 +10,22 @@ Thermos is a library for caching in rails that re-warms caches in the background
 
 Most cache strategies require either time-based or key-based expiration. These strategies have some downsides:
 
-##### Time-based expiration:
+*Time-based expiration:*
 
 - Stale data
 
-##### Key-based expiration:
+*Key-based expiration:*
 
 - Have to look up the record to determine whether the cache is warm, AND then might need to load more records in a cold cache scenario. Might have to balance cold vs warm cache performance as it pertains to eager loading records.
 - Associated model dependencies need to 'touch' the primary model, meaning more database writes to other tables when changes are made.
 
-##### Both:
+*Both:*
 
 - Potentially expensive cold-cache operations, people sometimes mitigate this with denormalization, which has it's own cache-related problems.
 
 With Thermos, the cache-filling operation is performed in the background, by observing model (and dependent model) changes.
 
-#### Thermos benefits:
+*Thermos benefits:*
 
 - Always warm cache
 - No need to 'touch' models to keep key-based cache up to date
@@ -40,7 +40,7 @@ In these examples any changes to a category, it's category items, or it's produc
 
 With `keep_warm`, the cached content is defined along with the cache block and dependencies definition.
 
-#### API Controller
+*API Controller*
 
 ```ruby
 json = Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:id], deps: [:category_items, :products]) do |id|
@@ -50,7 +50,7 @@ end
 render json: json
 ```
 
-#### Frontend Controller
+*Frontend Controller*
 
 ```ruby
 rendered_template = Thermos.keep_warm(key: "frontend_categories_show", model: Category, id: params[:id], deps: [:category_items, :products]) do |id|
@@ -65,7 +65,7 @@ render rendered_template
 
 With `fill` and `drink` the cache definition can be in one place, and the response can be used in multiple other places. This is useful if you share the same response in multiple controllers, and want to limit your number of cache keys. Even in the unlikely occurrence of a cache store failure and therefore cache miss, drink can still build up your desired response from the block that was originally defined in `fill`.
 
-#### Rails Initializer
+*Rails Initializer*
 
 ```ruby
 Thermos.fill(key: "api_categories_show", model: Category, deps: [:category_items, :products]) do |id|
@@ -73,7 +73,7 @@ Thermos.fill(key: "api_categories_show", model: Category, deps: [:category_items
 end
 ```
 
-#### API Controller
+*API Controller*
 
 ```ruby
 json = Thermos.drink(key: "api_categories_show", id: params[:id])
