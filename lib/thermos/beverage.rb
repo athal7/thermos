@@ -2,12 +2,13 @@
 
 module Thermos
   class Beverage
-    attr_reader :key, :model, :deps, :action, :lookup_key
+    attr_reader :key, :model, :deps, :action, :lookup_key, :filter
 
-    def initialize(key:, model:, deps:, action:, lookup_key: nil)
+    def initialize(key:, model:, deps:, action:, lookup_key: nil, filter: nil)
       @key = key
       @model = model
       @lookup_key = lookup_key || :id
+      @filter = filter || nil
       @deps = deps.map do |dep|
         Dependency.new(model: model, association: dep)
       end
@@ -23,6 +24,10 @@ module Thermos
               .where(dep.table => { id: dep_model.id })
               .pluck(@lookup_key)
       end.uniq
+    end
+
+    def should_fill?(model)
+      @filter.class == Proc ? !!@filter.call(model) : true
     end
 
     private
