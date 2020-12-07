@@ -126,6 +126,23 @@ class ThermosTest < ActiveSupport::TestCase
     assert_equal 1, Thermos.drink(key: "key", id: "foo")
     assert_raises(MockExpectationError) { mock.verify }
   end
+  
+  test "allows filtering for which records should be rebuilt" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    filter = ->(model) { model.name.match("ball") }
+    Thermos.fill(key: "key", model: Category, lookup_key: "name", filter: filter) do |name|
+      mock.call(name)
+    end
+
+    mock.expect(:call, 1, ["basketball"])
+    category.update!(name: "basketball")
+    mock.verify
+
+    mock.expect(:call, 1, ["hockey"])
+    category.update!(name: "hockey")
+    assert_raises(MockExpectationError) { mock.verify }
+  end
 
 # has_many model changes
   test "rebuilds the cache on has_many model change" do
