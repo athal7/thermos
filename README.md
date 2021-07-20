@@ -38,7 +38,7 @@ In these examples any changes to a category, it's category items, or it's produc
 
 ### keep_warm
 
-With `keep_warm`, the cached content is defined along with the cache block and dependencies definition.
+With `keep_warm`, the cached content is defined along with the cache block and dependencies definition. This is the simplest implementation, but does not work for all cases (e.g. using separate process for background jobs with ActiveJob)—see the next section about fill/drink for these cases.
 
 *API Controller*
 
