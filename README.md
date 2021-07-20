@@ -32,13 +32,17 @@ With Thermos, the cache-filling operation is performed in the background, by obs
 - Cache is only as stale as your background workers' latency
 - No need to worry about slow cold-cache operations (unless your cache store fails)
 
-## Examples
+## Prerequisites
+
+Make sure that you have configured [Rails' Cache Store](https://guides.rubyonrails.org/caching_with_rails.html#configuration) to allow shared cache access across processes (i.e. not MemoryStore, and ideally not FileStore).
+
+## Example Usage
 
 In these examples any changes to a category, it's category items, or it's products will trigger a rebuild of the cache for that category.
 
 ### keep_warm
 
-With `keep_warm`, the cached content is defined along with the cache block and dependencies definition. This is the simplest implementation, but does not work for all cases (e.g. using separate process for background jobs with ActiveJob)—see the next section about fill/drink for these cases.
+With `keep_warm`, the cached content is defined along with the cache block and dependencies definition. This is the simplest implementation, *but is only compatible with the [Active Job Inline Adapter](https://api.rubyonrails.org/classes/ActiveJob/QueueAdapters/InlineAdapter.html)*. See the next section about fill/drink for compatibility with other Active Job Adapters.
 
 *API Controller*
 
