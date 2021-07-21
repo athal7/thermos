@@ -2,14 +2,13 @@
 
 module Thermos
   class Dependency
-    attr_reader :model, :association, :klass, :table
+    attr_reader :model, :path, :klass, :table
 
-    def initialize(model:, association:)
+    def initialize(model:, ref:, path: nil)
       @model = model
-      @association = association
-      reflection = @model.reflections[@association.to_s]
-      @table = reflection.table_name
-      @klass = reflection.class_name.constantize
+      @path = path
+      @table = ref.table_name
+      @klass = ref.class_name.constantize
     end
   end
 end
