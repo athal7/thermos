@@ -331,6 +331,30 @@ class ThermosTest < ActiveSupport::TestCase
     assert_raises(MockExpectationError) { mock.verify }
   end
 
+  test "handles indirect associations" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    store = category.store
+
+    Thermos.fill(key: "key", model: Store, deps: [categories: [:products]]) do |id|
+      mock.call(id)
+    end
+
+    mock.expect(:call, 1, [store.id])
+    category.update!(name: "foo")
+    mock.verify
+  
+    mock.expect(:call, 2, [store.id])
+    assert_equal 1, Thermos.drink(key: "key", id: store.id)
+    assert_raises(MockExpectationError) { mock.verify }
+    Product.create!(categories: [category])
+    mock.verify
+    
+    mock.expect(:call, 3, [store.id])
+    assert_equal 2, Thermos.drink(key: "key", id: store.id)
+    assert_raises(MockExpectationError) { mock.verify }
+  end
+
   test "only rebuilds cache for stated dependencies, even if another cache has an associated model of the primary" do
     category_mock = Minitest::Mock.new
     product_mock = Minitest::Mock.new

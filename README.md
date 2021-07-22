@@ -86,7 +86,10 @@ render json: json
 
 ## Other options
 
-- If you want to be able to lookup by a key other than `id` (e.g. you use a slug in the params), you can specify the `lookup_key` as an argument to `keep_warm` or `fill`:
+
+### lookup_key
+
+If you want to be able to lookup by a key other than `id` (e.g. you use a slug in the params), you can specify the `lookup_key` as an argument to `keep_warm` or `fill`:
 
 ```ruby
 Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:slug], lookup_key: :slug) do |slug|
@@ -103,6 +106,18 @@ end
 
 Thermos.drink(key: "api_categories_show", id: params[:slug])
 ```
+
+### Indirect Relationships
+
+You can specify indirect relationships as dependencies as well. For example, if `Store has_many categories`, and `Category has_many products`, but there is no relationship specified on the `Store` model to `Product`:
+
+```ruby
+Thermos.keep_warm(key: "api_stores_show", model: Store, id: params[:id], deps: [categories: [:products]]) do |id|
+  Store.find(id).to_json
+end
+```
+
+*NOTE* in this example, a change to any model in the association chain will trigger a refill of the cache.
 
 ## Contributing
 

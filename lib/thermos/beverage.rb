@@ -9,9 +9,7 @@ module Thermos
       @model = model
       @lookup_key = lookup_key || :id
       @filter = filter || nil
-      @deps = deps.map do |dep|
-        Dependency.new(model: model, association: dep)
-      end
+      @deps = generate_deps(model, deps)
       @action = action
 
       set_observers
@@ -21,7 +19,7 @@ module Thermos
       @deps.select do |dep|
         dep.klass == dep_model.class
       end.flat_map do |dep|
-        @model.joins(dep.association)
+        @model.joins(dep.path)
               .where(dep.table => { id: dep_model.id })
               .pluck(@lookup_key)
       end.uniq
@@ -40,6 +38,35 @@ module Thermos
 
     def observe(model)
       model.include(Notifier) unless model.included_modules.include?(Notifier)
+    end
+
+    def generate_deps(model, deps, root = nil, path = nil)
+      deps.reduce([]) do |acc, dep|
+        if dep.is_a? Symbol
+          acc << Dependency.new(
+            model: root || model, 
+            ref: model.reflect_on_association(dep), 
+            path: path || dep)
+        elsif dep.is_a? Array
+          dep.each do |d| 
+            acc << Dependency.new(
+              model: root || model, 
+              ref: model.reflect_on_association(d), 
+              path: path || d)
+          end
+        elsif dep.is_a? Hash
+          dep.each do |k,v|
+            ref = model.reflect_on_association(k)
+            acc << Dependency.new(
+              model: root || model, 
+              ref: ref, 
+              path: path || k
+            )
+            acc.concat(generate_deps(ref.class_name.constantize, v, model, dep))
+          end
+        end
+        acc
+      end
     end
   end
 end
