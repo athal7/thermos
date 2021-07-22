@@ -16,8 +16,9 @@ module Thermos
     end
 
     def lookup_keys_for_dep_model(dep_model)
-      @deps.flat_map do |dep|
-        return [] unless dep.klass == dep_model.class
+      @deps.select do |dep|
+        dep.klass == dep_model.class
+      end.flat_map do |dep|
         @model.joins(dep.path)
               .where(dep.table => { id: dep_model.id })
               .pluck(@lookup_key)
