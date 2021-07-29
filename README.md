@@ -32,6 +32,8 @@ With Thermos, the cache-filling operation is performed in the background, by obs
 - Cache is only as stale as your background workers' latency
 - No need to worry about slow cold-cache operations (unless your cache store fails)
 
+> I just want to Thermos everything now!! Unbelievable improvement. It’s like every devs dream come true ([@jono-booth](https://github.com/jono-booth))
+
 ## Prerequisites
 
 Make sure that you have configured [Rails' Cache Store](https://guides.rubyonrails.org/caching_with_rails.html#configuration) to allow shared cache access across processes (i.e. not MemoryStore, and ideally not FileStore).
