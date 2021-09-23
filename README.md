@@ -121,6 +121,17 @@ end
 
 *NOTE* in this example, a change to any model in the association chain will trigger a refill of the cache.
 
+### filter
+
+You can provide a filter to restrict whether a record gets rebuilt on model changes:
+
+```ruby
+filter = ->(model) { model.name.match("ball") }
+Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:id], filter: filter) do |id|
+  Category.find(id).to_json
+end
+```
+
 ## Contributing
 
 Contributions are encouraged! Just fork it, make your change, and submit a pull request.
