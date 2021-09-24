@@ -111,6 +111,23 @@ class ThermosTest < ActiveSupport::TestCase
     assert_raises(MockExpectationError) { mock.verify }
   end
 
+  test "does not rebuild the cache on primary model destroy" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+
+    Thermos.fill(key: "key", model: Category) do |id|
+      mock.call(id)
+    end
+
+    mock.expect(:call, 1, [category.id])
+    assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    mock.verify
+
+    mock.expect(:call, 2, [category.id])
+    category.destroy!
+    assert_raises(MockExpectationError) { mock.verify }
+  end
+
   test "pre-builds cache for new primary model records" do
     mock = Minitest::Mock.new
 
