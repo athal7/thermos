@@ -3,6 +3,10 @@ class Category < ActiveRecord::Base
   has_many :products, through: :category_items
   belongs_to :store
 
+  def ball?
+    name.match("ball")
+  end
+
   def as_json(*args)
     {
       name: name,

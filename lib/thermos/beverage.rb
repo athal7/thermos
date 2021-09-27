@@ -19,9 +19,15 @@ module Thermos
       @deps.select do |dep|
         dep.klass == dep_model.class
       end.flat_map do |dep|
+        lookup_keys = []
+
         @model.joins(dep.path)
               .where(dep.table => { id: dep_model.id })
-              .pluck(@lookup_key)
+              .find_each do |model|
+                lookup_keys << model.send(@lookup_key) if should_fill?(model)
+              end
+
+        lookup_keys
       end.uniq
     end
 

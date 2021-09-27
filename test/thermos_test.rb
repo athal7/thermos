@@ -161,6 +161,28 @@ class ThermosTest < ActiveSupport::TestCase
     assert_raises(MockExpectationError) { mock.verify }
   end
 
+  test "allows filtering based on the beverage when multiple beverages are configured and only one of them has a filter" do
+    mock = Minitest::Mock.new
+    store = stores(:supermarket)
+    category = categories(:baseball)
+    # filter method specific to one model
+    # store.ball? doesn't exist
+    filter = ->(model) { model.ball? }
+
+    Thermos.fill(key: "key", model: Category, lookup_key: "name", filter: filter) do |name|
+      mock.call(name)
+    end
+
+    Thermos.fill(key: "key_2", model: Store, lookup_key: "name") do |name|
+      mock.call(name)
+    end
+
+    mock.expect(:call, 1, ["groceries"])
+    store.update!(name: "groceries")
+    assert_equal 1, Thermos.drink(key: "key_2", id: "groceries")
+    mock.verify
+  end
+
 # has_many model changes
   test "rebuilds the cache on has_many model change" do
     mock = Minitest::Mock.new
@@ -220,6 +242,26 @@ class ThermosTest < ActiveSupport::TestCase
 
     mock.expect(:call, 2, [category.id])
     assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    assert_raises(MockExpectationError) { mock.verify }
+  end
+
+  test "re-builds the cache for has_many record changes when filter condition is met" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    filter = ->(model) { model.ball? }
+
+    Thermos.fill(key: "key", model: Category, deps: [:category_items], filter: filter) do |id|
+      mock.call(id)
+    end
+
+    mock.expect(:call, 1, [category.id])
+    CategoryItem.create!(category: category)
+    mock.verify
+
+    category.update!(name: "hockey")
+
+    mock.expect(:call, 1, [category.id])
+    CategoryItem.create!(category: category)
     assert_raises(MockExpectationError) { mock.verify }
   end
 
@@ -286,6 +328,27 @@ class ThermosTest < ActiveSupport::TestCase
     assert_raises(MockExpectationError) { mock.verify }
   end
 
+  test "re-builds the cache for belongs_to record changes when filter condition is met" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    filter = ->(model) { model.ball? }
+
+    Thermos.fill(key: "key", model: Category, deps: [:store], filter: filter) do |id|
+      mock.call(id)
+    end
+
+    mock.expect(:call, 1, [category.id])
+    mock.expect(:call, 1, [category.id])
+    Store.create!(name: "foo", categories: [category])
+    mock.verify
+
+    category.update!(name: "hockey")
+
+    mock.expect(:call, 2, [category.id])
+    Store.create!(name: "bar", categories: [category])
+    assert_raises(MockExpectationError) { mock.verify }
+  end
+
 # has_many through model changes
   test "rebuilds the cache on has_many through model change" do
     mock = Minitest::Mock.new
@@ -345,6 +408,26 @@ class ThermosTest < ActiveSupport::TestCase
 
     mock.expect(:call, 2, [category.id])
     assert_equal 1, Thermos.drink(key: "key", id: category.id)
+    assert_raises(MockExpectationError) { mock.verify }
+  end
+
+  test "re-builds the cache for has_many through record changes when filter condition is met" do
+    mock = Minitest::Mock.new
+    category = categories(:baseball)
+    filter = ->(model) { model.ball? }
+
+    Thermos.fill(key: "key", model: Category, deps: [:products], filter: filter) do |id|
+      mock.call(id)
+    end
+
+    mock.expect(:call, 1, [category.id])
+    Product.create!(categories: [category])
+    mock.verify
+
+    category.update!(name: "hockey")
+
+    mock.expect(:call, 2, [category.id])
+    Product.create!(categories: [category])
     assert_raises(MockExpectationError) { mock.verify }
   end
 

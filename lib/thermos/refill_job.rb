@@ -17,10 +17,8 @@ module Thermos
 
     def refill_dependency_caches(model)
       BeverageStorage.instance.beverages.each do |beverage|
-        if beverage.should_fill?(model)
-          beverage.lookup_keys_for_dep_model(model).each do |lookup_key|
-            Thermos::RebuildCacheJob.perform_later(beverage.key, lookup_key)
-          end
+        beverage.lookup_keys_for_dep_model(model).each do |lookup_key|
+          Thermos::RebuildCacheJob.perform_later(beverage.key, lookup_key)
         end
       end
     end
