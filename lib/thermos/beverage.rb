@@ -2,15 +2,24 @@
 
 module Thermos
   class Beverage
-    attr_reader :key, :model, :deps, :action, :lookup_key, :filter
+    attr_reader :key, :model, :deps, :action, :lookup_key, :filter, :queue
 
-    def initialize(key:, model:, deps:, action:, lookup_key: nil, filter: nil)
+    def initialize(
+      key:,
+      model:,
+      deps:,
+      action:,
+      lookup_key: nil,
+      filter: nil,
+      queue: nil
+    )
       @key = key
       @model = model
       @lookup_key = lookup_key || :id
       @filter = filter || nil
       @deps = generate_deps(model, deps)
       @action = action
+      @queue = queue || ActiveJob::Base.default_queue_name
 
       set_observers
     end
