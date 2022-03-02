@@ -25,3 +25,9 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
 end
 
 ActiveJob::Base.queue_adapter = :inline
+ActiveSupport.test_order = :random
+
+def clear_cache
+  Thermos::BeverageStorage.instance.empty
+  Rails.cache.clear
+end
