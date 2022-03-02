@@ -105,7 +105,25 @@ or
 Thermos.fill(key: "api_categories_show", model: Category, lookup_key: :slug) do |slug|
   Category.find_by(slug: slug).to_json
 end
+```
 
+### queue
+
+If you want to specify a queue for the refill jobs to run other than the default queue, you can provide it to either way of using Thermos:
+
+```ruby
+Thermos.keep_warm(key: "api_categories_show", model: Category, queue: "low_priority") do |id|
+  Category.find(id).to_json
+end
+```
+
+or
+
+```ruby
+Thermos.fill(key: "api_categories_show", model: Category, queue: "low_priority") do |id|
+  Category.find(id).to_json
+end
+```
 Thermos.drink(key: "api_categories_show", id: params[:slug])
 ```
 
