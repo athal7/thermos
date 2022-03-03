@@ -16,19 +16,21 @@ module Thermos
     end
 
     def lookup_keys_for_dep_model(dep_model)
-      @deps.select do |dep|
-        dep.klass == dep_model.class
-      end.flat_map do |dep|
-        lookup_keys = []
+      @deps
+        .select { |dep| dep.klass == dep_model.class }
+        .flat_map do |dep|
+          lookup_keys = []
 
-        @model.joins(dep.path)
-              .where(dep.table => { id: dep_model.id })
-              .find_each do |model|
-                lookup_keys << model.send(@lookup_key) if should_fill?(model)
-              end
+          @model
+            .joins(dep.path)
+            .where(dep.table => { id: dep_model.id })
+            .find_each do |model|
+              lookup_keys << model.send(@lookup_key) if should_fill?(model)
+            end
 
-        lookup_keys
-      end.uniq
+          lookup_keys
+        end
+        .uniq
     end
 
     def should_fill?(model)
@@ -49,25 +51,26 @@ module Thermos
     def generate_deps(model, deps, root = nil, path = nil)
       deps.reduce([]) do |acc, dep|
         if dep.is_a? Symbol
-          acc << Dependency.new(
-            model: root || model, 
-            ref: model.reflect_on_association(dep), 
-            path: path || dep)
+          acc <<
+            Dependency.new(
+              model: root || model,
+              ref: model.reflect_on_association(dep),
+              path: path || dep,
+            )
         elsif dep.is_a? Array
-          dep.each do |d| 
-            acc << Dependency.new(
-              model: root || model, 
-              ref: model.reflect_on_association(d), 
-              path: path || d)
+          dep.each do |d|
+            acc <<
+              Dependency.new(
+                model: root || model,
+                ref: model.reflect_on_association(d),
+                path: path || d,
+              )
           end
         elsif dep.is_a? Hash
-          dep.each do |k,v|
+          dep.each do |k, v|
             ref = model.reflect_on_association(k)
-            acc << Dependency.new(
-              model: root || model, 
-              ref: ref, 
-              path: path || k
-            )
+            acc <<
+              Dependency.new(model: root || model, ref: ref, path: path || k)
             acc.concat(generate_deps(ref.class_name.constantize, v, model, dep))
           end
         end

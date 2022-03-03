@@ -4,19 +4,17 @@ class Category < ActiveRecord::Base
   belongs_to :store
 
   def ball?
-    name.match("ball")
+    name.match('ball')
   end
 
   def as_json(*args)
     {
       name: name,
       store_name: store.name,
-      category_items: category_items.map do |item|
-        {
-          name: item.name,
-          product_name: item.product.name
-        }
-      end
+      category_items:
+        category_items.map do |item|
+          { name: item.name, product_name: item.product.name }
+        end,
     }
   end
 end

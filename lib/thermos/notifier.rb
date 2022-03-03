@@ -4,9 +4,7 @@ module Thermos
   module Notifier
     extend ActiveSupport::Concern
 
-    included do
-      after_commit :notify_thermos, on: %i[create update]
-    end
+    included { after_commit :notify_thermos, on: %i[create update] }
 
     private
 

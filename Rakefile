@@ -27,6 +27,10 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = false
 end
 
+task(:format) do
+  system('bundle exec rbprettier --write {lib,test}/**/*.rb')
+end
+
 task(:default) do
   Dir.chdir('test/dummy')
   system('rake db:migrate')

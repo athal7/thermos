@@ -30,6 +30,9 @@ jobs:
           gem uninstall bundler
           gem install bundler
           bundle install --jobs 4 --retry 3
+      - name: Lint
+        run: |
+          bundle exec rbprettier --check {lib,test}/**/*.rb
       - name: Test
         env:
           RAILS_VERSION: ${{ matrix.rails }}
