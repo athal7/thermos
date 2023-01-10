@@ -37,4 +37,5 @@ ActiveRecord::Schema[7.0].define(version: 2016_03_26_174530) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
   end
+
 end
