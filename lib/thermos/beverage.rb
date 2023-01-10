@@ -60,26 +60,27 @@ module Thermos
     def generate_deps(model, deps, root = nil, path = nil)
       deps.reduce([]) do |acc, dep|
         if dep.is_a? Symbol
-          acc <<
-            Dependency.new(
-              model: root || model,
-              ref: model.reflect_on_association(dep),
-              path: path || dep,
-            )
+          acc << Dependency.new(
+            model: root || model,
+            ref: model.reflect_on_association(dep),
+            path: path || dep,
+          )
         elsif dep.is_a? Array
           dep.each do |d|
-            acc <<
-              Dependency.new(
-                model: root || model,
-                ref: model.reflect_on_association(d),
-                path: path || d,
-              )
+            acc << Dependency.new(
+              model: root || model,
+              ref: model.reflect_on_association(d),
+              path: path || d,
+            )
           end
         elsif dep.is_a? Hash
           dep.each do |k, v|
             ref = model.reflect_on_association(k)
-            acc <<
-              Dependency.new(model: root || model, ref: ref, path: path || k)
+            acc << Dependency.new(
+              model: root || model,
+              ref: ref,
+              path: path || k,
+            )
             acc.concat(generate_deps(ref.class_name.constantize, v, model, dep))
           end
         end
