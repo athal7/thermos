@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.rdoc']
   s.test_files = Dir['test/**/*']
 
-  s.required_ruby_version = ['>= 2.5.0', '< 2.8.0']
+  s.required_ruby_version = ['>= 2.6.0', '< 2.8.0']
 
   s.add_dependency 'rails', ['>= 5.2.4', '< 6.2.0']
   s.add_development_dependency 'rake'
