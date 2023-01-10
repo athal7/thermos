@@ -4,7 +4,7 @@ class Category < ActiveRecord::Base
   belongs_to :store
 
   def ball?
-    name.match('ball')
+    name.match("ball")
   end
 
   def as_json(*args)

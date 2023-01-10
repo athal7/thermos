@@ -10,9 +10,10 @@ module Thermos
     def refill_primary_caches(model)
       BeverageStorage.instance.beverages.each do |beverage|
         if beverage.model == model.class && beverage.should_fill?(model)
-          Thermos::RebuildCacheJob
-            .set(queue: beverage.queue)
-            .perform_later(beverage.key, model.send(beverage.lookup_key))
+          Thermos::RebuildCacheJob.set(queue: beverage.queue).perform_later(
+            beverage.key,
+            model.send(beverage.lookup_key),
+          )
         end
       end
     end
@@ -22,9 +23,10 @@ module Thermos
         beverage
           .lookup_keys_for_dep_model(model)
           .each do |lookup_key|
-            Thermos::RebuildCacheJob
-              .set(queue: beverage.queue)
-              .perform_later(beverage.key, lookup_key)
+            Thermos::RebuildCacheJob.set(queue: beverage.queue).perform_later(
+              beverage.key,
+              lookup_key,
+            )
           end
       end
     end
