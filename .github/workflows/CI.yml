@@ -27,8 +27,8 @@ jobs:
           - "3.0"
           - "3.1"
         rails:
-          - "7.0.4"
-          - "6.1.7"
+          - "7.0"
+          - "6.1"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
