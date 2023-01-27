@@ -9,7 +9,7 @@ rails = case rails_version
         when 'main'
           { github: 'rails/rails' }
         when 'default'
-          '~> 7.0.4'
+          '~> 7.0'
         else
           "~> #{rails_version}"
         end
