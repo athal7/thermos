@@ -22,8 +22,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ['>= 2.7.0', '< 3.2.0']
 
-  s.add_runtime_dependency 'rails', ['~> 6.1', '>= 6.1.7.1']
-  s.add_runtime_dependency 'rails', ['~> 7.0', '>= 7.0.4.1']
+  s.add_runtime_dependency 'rails', ['~> 6.1', '~> 7.0']
   s.add_development_dependency 'rake'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'prettier'
