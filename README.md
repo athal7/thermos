@@ -123,7 +123,7 @@ or
 Thermos.fill(key: "api_categories_show", model: Category, queue: "low_priority") do |id|
   Category.find(id).to_json
 end
-```
+
 Thermos.drink(key: "api_categories_show", id: params[:slug])
 ```
 
