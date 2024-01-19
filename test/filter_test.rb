@@ -27,7 +27,7 @@ class FilterTest < ActiveSupport::TestCase
   test "allows filtering based on the beverage when multiple beverages are configured and only one of them has a filter" do
     mock = Minitest::Mock.new
     store = stores(:supermarket)
-    category = categories(:baseball)
+    _category = categories(:baseball)
 
     # filter method specific to one model
     # store.ball? doesn't exist
