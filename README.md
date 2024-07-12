@@ -150,8 +150,12 @@ Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:id], 
 end
 ```
 
-## Contributing
+## Contributors
 
-Contributions are encouraged! Just fork it, make your change, and submit a pull request.
+<a href="https://github.com/athal7/thermos/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=athal7/thermos" />
+</a>
 
-This project rocks and uses MIT-LICENSE.
+## License
+
+This project uses MIT-LICENSE.
