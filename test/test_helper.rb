@@ -29,7 +29,7 @@ elsif ActiveSupport::TestCase.respond_to?(:fixture_paths=)
 end
 ActiveSupport::TestCase.fixtures :all
 
-ActiveJob::Base.queue_adapter = :test
+ActiveJob::Base.queue_adapter = :inline
 ActiveSupport.test_order = :random
 
 def clear_cache
