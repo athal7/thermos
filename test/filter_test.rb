@@ -1,6 +1,6 @@
 require "test_helper"
 
-class FilterTest < ActiveSupport::TestCase
+class FilterTest < ActiveJob::TestCase
   self.use_transactional_tests = true
   teardown :clear_cache
 
@@ -16,11 +16,11 @@ class FilterTest < ActiveSupport::TestCase
     ) { |name| mock.call(name) }
 
     mock.expect(:call, 1, ["basketball"])
-    category.update!(name: "basketball")
+    perform_enqueued_jobs { category.update!(name: "basketball") }
     mock.verify
 
     mock.expect(:call, 1, ["hockey"])
-    category.update!(name: "hockey")
+    perform_enqueued_jobs { category.update!(name: "hockey") }
     assert_raises(MockExpectationError) { mock.verify }
   end
 

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class ThermosTest < ActiveSupport::TestCase
+class ThermosTest < ActiveJob::TestCase
   self.use_transactional_tests = true
   teardown :clear_cache
 
@@ -50,7 +50,7 @@ class ThermosTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 2, [category.id])
-    category.update!(name: "foo")
+    perform_enqueued_jobs { category.update!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 3, [category.id])
@@ -92,7 +92,7 @@ class ThermosTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 1, [category.id])
-    category.update!(name: "foo")
+    perform_enqueued_jobs { category.update!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 3, [other_category.id])
@@ -123,7 +123,7 @@ class ThermosTest < ActiveSupport::TestCase
     end
 
     mock.expect(:call, 1, ["foo"])
-    Category.create!(name: "foo")
+    perform_enqueued_jobs { Category.create!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 2, ["foo"])
@@ -144,7 +144,7 @@ class ThermosTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 2, ["foo"])
-    category.update!(name: "foo")
+    perform_enqueued_jobs { category.update!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 3, [category.name])

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class DependenciesTest < ActiveSupport::TestCase
+class DependenciesTest < ActiveJob::TestCase
   self.use_transactional_tests = true
   teardown :clear_cache
 
@@ -18,7 +18,7 @@ class DependenciesTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 2, [category.id])
-    category_item.update!(name: "foo")
+    perform_enqueued_jobs { category_item.update!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 3, [category.id])
@@ -40,7 +40,7 @@ class DependenciesTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 2, [category.id])
-    category_item.update!(name: "foo")
+    perform_enqueued_jobs { category_item.update!(name: "foo") }
     assert_raises(MockExpectationError) { mock.verify }
 
     mock.expect(:call, 3, [category.id])
@@ -57,7 +57,7 @@ class DependenciesTest < ActiveSupport::TestCase
     end
 
     mock.expect(:call, 1, [category.id])
-    CategoryItem.create!(category: category)
+    perform_enqueued_jobs { CategoryItem.create!(category: category) }
     mock.verify
 
     mock.expect(:call, 2, [category.id])
@@ -78,13 +78,13 @@ class DependenciesTest < ActiveSupport::TestCase
     ) { |id| mock.call(id) }
 
     mock.expect(:call, 1, [category.id])
-    CategoryItem.create!(category: category)
+    perform_enqueued_jobs { CategoryItem.create!(category: category) }
     mock.verify
 
-    category.update!(name: "hockey")
+    perform_enqueued_jobs { category.update!(name: "hockey") }
 
     mock.expect(:call, 1, [category.id])
-    CategoryItem.create!(category: category)
+    perform_enqueued_jobs { CategoryItem.create!(category: category) }
     assert_raises(MockExpectationError) { mock.verify }
   end
 
@@ -102,7 +102,7 @@ class DependenciesTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 2, [category.id])
-    store.update!(name: "foo")
+    perform_enqueued_jobs { store.update!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 3, [category.id])
@@ -142,7 +142,7 @@ class DependenciesTest < ActiveSupport::TestCase
 
     mock.expect(:call, 1, [category.id])
     mock.expect(:call, 1, [category.id])
-    Store.create!(name: "foo", categories: [category])
+    perform_enqueued_jobs { Store.create!(name: "foo", categories: [category]) }
     mock.verify
 
     mock.expect(:call, 2, [category.id])
@@ -164,13 +164,13 @@ class DependenciesTest < ActiveSupport::TestCase
 
     mock.expect(:call, 1, [category.id])
     mock.expect(:call, 1, [category.id])
-    Store.create!(name: "foo", categories: [category])
+    perform_enqueued_jobs { Store.create!(name: "foo", categories: [category]) }
     mock.verify
 
     category.update!(name: "hockey")
 
     mock.expect(:call, 2, [category.id])
-    Store.create!(name: "bar", categories: [category])
+    perform_enqueued_jobs { Store.create!(name: "bar", categories: [category]) }
     assert_raises(MockExpectationError) { mock.verify }
   end
 
@@ -188,7 +188,7 @@ class DependenciesTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 2, [category.id])
-    product.update!(name: "foo")
+    perform_enqueued_jobs { product.update!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 3, [category.id])
@@ -210,7 +210,7 @@ class DependenciesTest < ActiveSupport::TestCase
     mock.verify
 
     mock.expect(:call, 2, [category.id])
-    product.update!(name: "foo")
+    perform_enqueued_jobs { product.update!(name: "foo") }
     assert_raises(MockExpectationError) { mock.verify }
 
     mock.expect(:call, 3, [category.id])
@@ -227,7 +227,7 @@ class DependenciesTest < ActiveSupport::TestCase
     end
 
     mock.expect(:call, 1, [category.id])
-    Product.create!(categories: [category])
+    perform_enqueued_jobs { Product.create!(categories: [category]) }
     mock.verify
 
     mock.expect(:call, 2, [category.id])
@@ -248,13 +248,13 @@ class DependenciesTest < ActiveSupport::TestCase
     ) { |id| mock.call(id) }
 
     mock.expect(:call, 1, [category.id])
-    Product.create!(categories: [category])
+    perform_enqueued_jobs { Product.create!(categories: [category]) }
     mock.verify
 
     category.update!(name: "hockey")
 
     mock.expect(:call, 2, [category.id])
-    Product.create!(categories: [category])
+    perform_enqueued_jobs { Product.create!(categories: [category]) }
     assert_raises(MockExpectationError) { mock.verify }
   end
 
@@ -270,13 +270,13 @@ class DependenciesTest < ActiveSupport::TestCase
     ) { |id| mock.call(id) }
 
     mock.expect(:call, 1, [store.id])
-    category.update!(name: "foo")
+    perform_enqueued_jobs { category.update!(name: "foo") }
     mock.verify
 
     mock.expect(:call, 2, [store.id])
     assert_equal 1, Thermos.drink(key: "key", id: store.id)
     assert_raises(MockExpectationError) { mock.verify }
-    Product.create!(categories: [category])
+    perform_enqueued_jobs { Product.create!(categories: [category]) }
     mock.verify
 
     mock.expect(:call, 3, [store.id])
@@ -300,7 +300,7 @@ class DependenciesTest < ActiveSupport::TestCase
 
     category_mock.expect(:call, 2, [category.id])
     product_mock.expect(:call, 2, [product.id])
-    product.update!(name: "foo")
+    perform_enqueued_jobs { product.update!(name: "foo") }
     assert_raises(MockExpectationError) { category_mock.verify }
     product_mock.verify
   end
