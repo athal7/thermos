@@ -10,31 +10,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2016_03_26_174530) do
+ActiveRecord::Schema[8.1].define(version: 2016_03_26_174530) do
   create_table "categories", force: :cascade do |t|
+    t.datetime "created_at", precision: nil, null: false
     t.string "name"
     t.integer "store_id"
-    t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "category_items", force: :cascade do |t|
-    t.string "name"
     t.integer "category_id"
-    t.integer "product_id"
     t.datetime "created_at", precision: nil, null: false
+    t.string "name"
+    t.integer "product_id"
     t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "products", force: :cascade do |t|
-    t.string "name"
     t.datetime "created_at", precision: nil, null: false
+    t.string "name"
     t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "stores", force: :cascade do |t|
-    t.string "name"
     t.datetime "created_at", precision: nil, null: false
+    t.string "name"
     t.datetime "updated_at", precision: nil, null: false
   end
 end

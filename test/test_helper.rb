@@ -6,11 +6,11 @@ ActiveRecord::Migrator.migrations_paths = [
   File.expand_path("../../test/dummy/db/migrate", __FILE__),
 ]
 require "rails/test_help"
+require "minitest/mock"
 
 # Filter out Minitest backtrace while allowing backtrace from other libraries
 # to be shown.
 Minitest.backtrace_filter = Minitest::BacktraceFilter.new
-require "minitest/mock"
 
 # Load support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }

@@ -20,11 +20,11 @@ Gem::Specification.new do |s|
   s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.rdoc']
   s.test_files = Dir['test/**/*']
 
-  s.required_ruby_version = ['~> 3.0']
+  s.required_ruby_version = '>= 3.2'
 
-  s.add_runtime_dependency 'rails'
+  s.add_runtime_dependency 'rails', '>= 7.1', '< 9'
+  s.add_development_dependency 'minitest', '~> 5.0'
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'sqlite3', '~> 1.4'
+  s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'prettier'
-  s.add_development_dependency 'psych', '< 4.0.0'
 end
