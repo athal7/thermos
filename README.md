@@ -150,6 +150,34 @@ Thermos.keep_warm(key: "api_categories_show", model: Category, id: params[:id], 
 end
 ```
 
+## Using with ETags
+
+Thermos works seamlessly with Rails' HTTP caching via ETags, enabling browser and CDN caching of your responses. Since Thermos keeps your cache always warm and rebuilds it when models change, the cached value's digest will naturally change when the underlying data changes.
+
+Use Rails' `stale?` helper with the cached value to enable conditional GET requests:
+
+```ruby
+def show
+  json = Thermos.drink(key: "api_categories_show", id: params[:id])
+
+  if stale?(etag: json)
+    render json: json
+  end
+end
+```
+
+When the cached value changes (triggered by model updates), the ETag will change, and clients will receive the new content. When the value hasn't changed, clients with a matching ETag will receive a `304 Not Modified` response.
+
+This enables caching at multiple layers:
+- **Browser cache**: Browsers store responses and revalidate with the server using the ETag, avoiding re-downloads of unchanged content
+- **CDN cache**: CDNs can cache responses and serve them directly to users, only revalidating with your server when needed
+
+Combined with Thermos, you get:
+- **Always-warm application cache** (no cold cache penalties)
+- **Reduced server load** (304 responses skip rendering)
+- **Reduced bandwidth** (browsers and CDNs serve cached content)
+- **Faster responses** (CDN edge locations serve content closer to users)
+
 ## Contributors
 
 <a href="https://github.com/athal7/thermos/graphs/contributors">
