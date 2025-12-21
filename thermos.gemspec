@@ -10,14 +10,25 @@ Gem::Specification.new do |s|
   s.authors = ['Andrew Thal']
   s.email = ['athal7@me.com']
   s.homepage = 'https://github.com/athal7/thermos'
-  s.summary = 'Always-warm, auto-rebuilding rails caching without timers or touching.'
+  s.summary = 'Always-warm, auto-rebuilding Rails cache that updates in the background when models change.'
   s.description = <<~HEREDOC
-    Thermos is a library for caching in rails that re-warms caches
-    in the background based on model changes.
+    Thermos is a Rails caching library that keeps your cache always warm by
+    automatically rebuilding it in the background when ActiveRecord models change.
+    No more stale data from TTL expiration, no more slow cold cache hits, and no
+    need to 'touch' associated models. Works with any ActiveJob backend (Sidekiq,
+    Solid Queue, etc.) and any cache store (Redis, Memcached, Solid Cache, etc.).
+    Perfect for API responses, JSON serialization, and view caching.
   HEREDOC
   s.license = 'MIT'
 
-  s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.rdoc']
+  s.metadata = {
+    'homepage_uri' => s.homepage,
+    'source_code_uri' => 'https://github.com/athal7/thermos',
+    'changelog_uri' => 'https://github.com/athal7/thermos/releases',
+    'rubygems_mfa_required' => 'true',
+  }
+
+  s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
   s.test_files = Dir['test/**/*']
 
   s.required_ruby_version = '>= 3.2'

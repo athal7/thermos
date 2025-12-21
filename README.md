@@ -1,50 +1,73 @@
 # Thermos
 
+**Always-warm Rails caching that automatically rebuilds when your models change.**
+
 [![Gem Version](https://badge.fury.io/rb/thermos.svg)](https://badge.fury.io/rb/thermos)
 [![Code Climate](https://codeclimate.com/github/athal7/thermos/badges/gpa.svg)](https://codeclimate.com/github/athal7/thermos)
-![Build Status)](https://img.shields.io/github/actions/workflow/status/athal7/thermos/CI.yml?branch=main)
+![Build Status](https://img.shields.io/github/actions/workflow/status/athal7/thermos/CI.yml?branch=main)
 
-Thermos is a library for caching in rails that re-warms caches in the background based on model changes.
+Thermos is a Rails caching library that keeps your cache always warm by rebuilding it in the background whenever ActiveRecord models change. No more stale data, no more cold cache penalties, no more `touch: true` on all your associations.
 
-## Why Do I Need Thermos?
+## Features
 
-Most cache strategies require either time-based or key-based expiration. These strategies have some downsides:
+- **Always-warm cache** — Cache is rebuilt in the background when models change
+- **No stale data** — Unlike TTL-based caching, data is only as stale as your job queue latency
+- **No cold cache penalties** — Cache is pre-warmed, so users never wait for expensive queries
+- **No `touch` callbacks needed** — Thermos watches model dependencies automatically
+- **Works with any backend** — Sidekiq, Solid Queue, Resque, or any ActiveJob adapter
+- **Works with any cache store** — Redis, Memcached, Solid Cache, or any Rails cache store
+- **ETag support** — Works seamlessly with HTTP caching for browser and CDN caching
 
-*Time-based expiration:*
+## Installation
 
-- Stale data
+Add to your Gemfile:
 
-*Key-based expiration:*
+```ruby
+gem 'thermos'
+```
 
-- Have to look up the record to determine whether the cache is warm, AND then might need to load more records in a cold cache scenario. Might have to balance cold vs warm cache performance as it pertains to eager loading records.
-- Associated model dependencies need to 'touch' the primary model, meaning more database writes to other tables when changes are made.
+Then run:
 
-*Both:*
+```bash
+bundle install
+```
 
-- Potentially expensive cold-cache operations, people sometimes mitigate this with denormalization, which has it's own cache-related problems.
+## Quick Start
 
-With Thermos, the cache-filling operation is performed in the background, by observing model (and dependent model) changes.
+```ruby
+# In a controller - cache is automatically rebuilt when Category or its products change
+json = Thermos.keep_warm(key: "category", model: Category, id: params[:id], deps: [:products]) do |id|
+  Category.includes(:products).find(id).to_json
+end
 
-*Thermos benefits:*
+render json: json
+```
 
-- Always warm cache
-- No need to 'touch' models to keep key-based cache up to date
-- Cache is only as stale as your background workers' latency
-- No need to worry about slow cold-cache operations (unless your cache store fails)
+That's it! When any `Category` or associated `Product` is created, updated, or destroyed, Thermos automatically rebuilds the cache in the background.
 
-> I just want to Thermos everything now!! Unbelievable improvement. It’s like every devs dream come true ([@jono-booth](https://github.com/jono-booth))
+## Why Thermos?
+
+Most cache strategies have significant downsides:
+
+| Strategy | Problem |
+|----------|---------|
+| **TTL-based** (expires_in) | Stale data until expiration |
+| **Key-based** (cache_key) | Cold cache on first request after any change |
+| **Touch callbacks** | Extra database writes on every association change |
+
+Thermos solves all of these by rebuilding caches proactively in background jobs.
+
+> "I just want to Thermos everything now!! Unbelievable improvement. It's like every dev's dream come true" — [@jono-booth](https://github.com/jono-booth)
 
 ## Prerequisites
 
-Make sure that you have configured [Rails' Cache Store](https://guides.rubyonrails.org/caching_with_rails.html#configuration) to allow shared cache access across processes (i.e. not MemoryStore, and ideally not FileStore).
+Configure a [Rails Cache Store](https://guides.rubyonrails.org/caching_with_rails.html#configuration) that supports shared access across processes (Redis, Memcached, Solid Cache — not MemoryStore).
 
-Thermos works with any ActiveJob adapter and any Rails cache store, including Rails 8's [Solid Queue](https://github.com/rails/solid_queue) and [Solid Cache](https://github.com/rails/solid_cache).
+Thermos works with any ActiveJob adapter, including Rails 8's [Solid Queue](https://github.com/rails/solid_queue) and [Solid Cache](https://github.com/rails/solid_cache).
 
-## Example Usage
+## Usage
 
-In these examples any changes to a category, it's category items, or it's products will trigger a rebuild of the cache for that category.
-
-### keep_warm
+### keep_warm (Simple)
 
 With `keep_warm`, the cached content is defined along with the cache block and dependencies definition. This is the simplest implementation, *but is only compatible with the [Active Job Inline Adapter](https://api.rubyonrails.org/classes/ActiveJob/QueueAdapters/InlineAdapter.html)*. See the next section about fill/drink for compatibility with other Active Job Adapters.
 
@@ -69,9 +92,9 @@ end
 render rendered_template
 ```
 
-### fill / drink
+### fill / drink (Advanced)
 
-With `fill` and `drink` the cache definition can be in one place, and the response can be used in multiple other places. This is useful if you share the same response in multiple controllers, and want to limit your number of cache keys. Even in the unlikely occurrence of a cache store failure and therefore cache miss, drink can still build up your desired response from the block that was originally defined in `fill`.
+For more control, define your cache once with `fill` and read it anywhere with `drink`. This is ideal for sharing cached data across multiple controllers or when using background job adapters other than inline.
 
 *Rails Initializer*
 
@@ -88,8 +111,7 @@ json = Thermos.drink(key: "api_categories_show", id: params[:id])
 render json: json
 ```
 
-## Other options
-
+## Options
 
 ### lookup_key
 
