@@ -15,15 +15,16 @@ jobs:
       run: |
         gem uninstall bundler
         gem install bundler
-        bundle install --jobs 4 --retry 3        
+        bundle install --jobs 4 --retry 3
     - name: Lint
       run: bundle exec rbprettier --check {lib,test}/**/*.rb
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        ruby: [3.2, 3.3]
-        rails: [7.2, 7.1]
+        ruby: ['3.2', '3.3', '3.4']
+        rails: ['7.1', '7.2', '8.0']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
