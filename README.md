@@ -38,6 +38,8 @@ With Thermos, the cache-filling operation is performed in the background, by obs
 
 Make sure that you have configured [Rails' Cache Store](https://guides.rubyonrails.org/caching_with_rails.html#configuration) to allow shared cache access across processes (i.e. not MemoryStore, and ideally not FileStore).
 
+Thermos works with any ActiveJob adapter and any Rails cache store, including Rails 8's [Solid Queue](https://github.com/rails/solid_queue) and [Solid Cache](https://github.com/rails/solid_cache).
+
 ## Example Usage
 
 In these examples any changes to a category, it's category items, or it's products will trigger a rebuild of the cache for that category.
