@@ -2,9 +2,31 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
-    schedule: 
+    schedule:
       interval: "weekly"
-  - package-ecosystem: "rubygems"
+      day: "monday"
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: "bundler"
     directory: "/"
-    schedule: 
-      interval: "bundler"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    # Group updates to reduce PR noise
+    groups:
+      # Group all dev dependencies together
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group production dependencies together
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
